@@ -26,6 +26,12 @@ void handleInterrupt21(int AX, int BX, int CX, int DX)
 
 void printString(char *string)
 {
+    int i = 0;
+    while(string[i] != '\0'){
+        if (string[i] == '\n') interrupt(0x10, 0xe*256+'\r', 0, 0, 0);
+        interrupt(0x10, 0xe*256 + string[i], 0, 0, 0);
+        i+=1;
+    }
 }
 
 void readString(char *string)
