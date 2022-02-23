@@ -26,11 +26,18 @@ void memcpy(byte *dest, byte *src, unsigned int n) {}
 unsigned int strlen(char *string) {}
 // Mengembalikan panjang suatu null terminated string
 
-bool strcmp(char *s1, char *s2) {}
-// Mengembalikan true jika string sama
+bool strcmp(char *s1, char *s2) {
+    // Mengembalikan true jika string sama
+    int i = 0;
+    while(s1[i] == s2[i] && s1[i] != '\0' && s2[i] != '\0'){
+        i++;
+    }
+    return (s1[i] == '\0' && s1[i] == '\0');
+}
 
-void strcpy(char *dst, char *src) {}
-// Melakukan penyalinan null terminated string
+void strcpy(char *dst, char *src) {
+    // Melakukan penyalinan null terminated string
+}
 
 void clear(byte *ptr, unsigned int n) {
     // Mengosongkan byte array yang memiliki panjang n
