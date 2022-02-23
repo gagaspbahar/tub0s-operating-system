@@ -23,7 +23,13 @@ int mod(int a, int n) {
 void memcpy(byte *dest, byte *src, unsigned int n) {}
 // Mengcopy n bytes yang ditunjuk src ke dest
 
-unsigned int strlen(char *string) {}
+unsigned int strlen(char *string) {
+	int ans = 0;
+	while(string[ans] != '\0'){
+		ans++;
+	}
+	return ans;
+}
 // Mengembalikan panjang suatu null terminated string
 
 bool strcmp(char *s1, char *s2) {
