@@ -20,17 +20,22 @@ int mod(int a, int n) {
 
 // Operasi standar bahasa C
 // Implementasikan
-void memcpy(byte *dest, byte *src, unsigned int n) {}
-// Mengcopy n bytes yang ditunjuk src ke dest
+void memcpy(byte *dest, byte *src, unsigned int n) {
+    // Mengcopy n bytes yang ditunjuk src ke dest
+    int i;
+    for(i = 0; i < n; i++){
+        dest[i] = src[i];
+    }
+}
 
 unsigned int strlen(char *string) {
+    // Mengembalikan panjang suatu null terminated string
 	int ans = 0;
 	while(string[ans] != '\0'){
 		ans++;
 	}
 	return ans;
 }
-// Mengembalikan panjang suatu null terminated string
 
 bool strcmp(char *s1, char *s2) {
     // Mengembalikan true jika string sama
@@ -43,6 +48,11 @@ bool strcmp(char *s1, char *s2) {
 
 void strcpy(char *dst, char *src) {
     // Melakukan penyalinan null terminated string
+    int i = 0;
+    while(src[i] != '\0'){
+        dst[i] = src[i];
+        i++;
+    }
 }
 
 void clear(byte *ptr, unsigned int n) {
