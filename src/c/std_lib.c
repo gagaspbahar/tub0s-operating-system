@@ -3,9 +3,20 @@
 // Opsional : Tambahkan implementasi kode C
 
 // TODO
-int div(int a, int b) {}
+int div(int a, int b) {
+    int ans = 0;
+	while (ans * b <= a){
+		ans++;
+	}
+	return ans - 1;
+}
 
-int mod(int a, int n) {}
+int mod(int a, int n) {
+    while (a >= n){
+		a = a - n;
+	}
+	return a;
+}
 
 // Operasi standar bahasa C
 // Implementasikan
@@ -21,5 +32,10 @@ bool strcmp(char *s1, char *s2) {}
 void strcpy(char *dst, char *src) {}
 // Melakukan penyalinan null terminated string
 
-void clear(byte *ptr, unsigned int n) {}
-// Mengosongkan byte array yang memiliki panjang n
+void clear(byte *ptr, unsigned int n) {
+    // Mengosongkan byte array yang memiliki panjang n
+    int i;
+	for (i = 0; i < n; i++){
+		ptr[i] = 0x00;
+	}
+}
