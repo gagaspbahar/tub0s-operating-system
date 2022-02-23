@@ -21,7 +21,17 @@ int main()
 // TODO
 void handleInterrupt21(int AX, int BX, int CX, int DX)
 {
-    // Definisi kosong
+    switch (AX)
+    {
+    case 0x0:
+        printString(BX);
+        break;
+    case 0x1:
+        readString(BX);
+        break;
+    default:
+        printString("Invalid interrupt");
+    }
 }
 
 void printString(char *string)
