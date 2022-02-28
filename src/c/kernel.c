@@ -11,12 +11,14 @@ int main()
 {
     char buf[128];
     clearScreen();
+
     makeInterrupt21();
     printString("Halo dunia!\r\n");
-    readString(buf);
-    printString(buf);
     
-    while (true);
+    while (1){
+        readString(buf);
+        printString(buf);
+    }
 }
 
 // TODO
@@ -40,28 +42,30 @@ void printString(char *string)
     int i = 0;
     while (string[i] != '\0')
     {
+        interrupt(0x10, 0x0E00 + string[i], 0, 0, 0);
         if (string[i] == '\n')
         {
-            interrupt(0x10, 0xe * 256 + '\r', 0, 0, 0);
+            interrupt(0x10, 0x0E00+0xd, 0, 0, 0);
         }
-        interrupt(0x10, 0xe * 256 + string[i], 0, 0, 0);
-        i += 1;
+        i++;
     }
 }
 
 void readString(char *string)
 {
-    int ch;
+    char ch;
     int idx = 0;
-    while (true)
+
+    int flag = 1;
+    while (flag)
     {
         ch = interrupt(0x16, 0, 0, 0, 0);
-        if (ch == '\r')
+        if (ch == '\r' || ch == '\n')
         {
             string[idx] = '\0';
             interrupt(0x10, 0x0E00 + '\n', 0, 0, 0); // LF
             interrupt(0x10, 0x0E00 + '\r', 0, 0, 0); // CR
-            break;
+            flag = 0;
         }
         else if (ch = '\b')
         {
@@ -86,5 +90,4 @@ void clearScreen()
 {
     interrupt(0x10, 0x3, 0, 0, 0);
     interrupt(0x10, 0x200, 0, 0, 0);
-    putInMemory(0xB000, 0x8001, 0xF);
 }
