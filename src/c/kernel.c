@@ -73,7 +73,7 @@ void readString(char *string)
             interrupt(0x10, 0x0E00 + '\r', 0, 0, 0); // CR
             flag = 0;
         }
-        else if (ch = '\b')
+        else if (ch == '\b')
         {
             if (idx > 0 && mod(idx, 80) != 0)
             {
