@@ -13,6 +13,12 @@ int main()
     clearScreen();
 
     makeInterrupt21();
+    printString(".___________. __    __  .______     ___        _______.\n");
+    printString("|           ||  |  |  | |   _  \\   / _ \\      /       |\n");
+    printString("`---|  |----`|  |  |  | |  |_)  | | | | |    |   (----`\n");
+    printString("    |  |     |  |  |  | |   _  <  | | | |     \\   \\    \n");
+    printString("    |  |     |  `--'  | |  |_)  | | |_| | .----)   |   \n");
+    printString("    |__|      \\______/  |______/   \\___/  |_______/    \n");
     printString("Halo dunia!\r\n");
     
     while (1){
@@ -88,6 +94,7 @@ void readString(char *string)
 
 void clearScreen()
 {
-    interrupt(0x10, 0x3, 0, 0, 0);
-    interrupt(0x10, 0x200, 0, 0, 0);
+    interrupt(0x10, 0x3, 0, 0, 0); // Ubah video mode menjadi 3
+    interrupt(0x10, (6<<8), 0xF << 8, 0, (24 << 8) + 79); // Hapus layar dengan scroll up window & ubah warna buffer
+    interrupt(0x10, 0x200, 0, 0, 0); // Set cursor ke pojok kiri atas
 }
