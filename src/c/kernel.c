@@ -13,13 +13,13 @@ int main()
     clearScreen();
 
     makeInterrupt21();
-    printString(".___________. __    __  .______     ___        _______.\n");
-    printString("|           ||  |  |  | |   _  \\   / _ \\      /       |\n");
-    printString("`---|  |----`|  |  |  | |  |_)  | | | | |    |   (----`\n");
-    printString("    |  |     |  |  |  | |   _  <  | | | |     \\   \\    \n");
-    printString("    |  |     |  `--'  | |  |_)  | | |_| | .----)   |   \n");
-    printString("    |__|      \\______/  |______/   \\___/  |_______/    \n");
-    printString("Halo dunia!\r\n");
+    printString("             .___________. __    __  .______     ___        _______.\n");
+    printString("             |           ||  |  |  | |   _  \\   / _ \\      /       |\n");
+    printString("             `---|  |----`|  |  |  | |  |_)  | | | | |    |   (----`\n");
+    printString("                 |  |     |  |  |  | |   _  <  | | | |     \\   \\    \n");
+    printString("                 |  |     |  `--'  | |  |_)  | | |_| | .----)   |   \n");
+    printString("                 |__|      \\______/  |______/   \\___/  |_______/    \n");
+    printString("                                    Halo dunia!\r\n");
     
     while (1){
         readString(buf);
