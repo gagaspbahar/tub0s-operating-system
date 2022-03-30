@@ -6,6 +6,7 @@
 
 #include "header/kernel.h"
 #include "header/std_lib.h"
+#include "header/filesystem.h"
 
 int main()
 {
@@ -199,8 +200,7 @@ void write(struct file_metadata *metadata, enum fs_retcode *return_code){
   // 3. Jika menulis file, tuliskan juga byte S sesuai indeks sector
   // 4. Persiapkan variabel j = 0 untuk iterator entry sector yang kosong
   // 5. Persiapkan variabel buffer untuk entry sector kosong
-  // 6. Lakukan iterasi berikut dengan kondisi perulangan 
-        (penulisan belum selesai && i = 0..255)
+  // 6. Lakukan iterasi berikut dengan kondisi perulangan (penulisan belum selesai && i = 0..255)
   //    1. Cek apakah map[i] telah terisi atau tidak
   //    2. Jika terisi, lanjutkan ke iterasi selanjutnya / continue
   //    3. Tandai map[i] terisi
@@ -243,8 +243,7 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code){
   // 5. Jika byte valid, lakukan readSector() 
   //    dan masukkan kedalam buffer yang disediakan pada metadata
   // 6. Lompat ke iterasi selanjutnya hingga iterasi selesai
-  // 7. Tulis retcode FS_SUCCESS dan ganti filesize 
-        pada akhir proses pembacaan.
+  // 7. Tulis retcode FS_SUCCESS dan ganti filesize pada akhir proses pembacaan.
 
 }
 
@@ -259,12 +258,10 @@ void shell(){
     printString("$");
     readString(input_buf);
    
-    if (strcmp(input_buf, "cd") {
+    if (strcmp(input_buf, "cd")){
       // Utility cd
     }
     else 
       printString("Unknown command\r\n");
- 
-  }
-
+ }
 }

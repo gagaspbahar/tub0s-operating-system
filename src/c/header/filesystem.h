@@ -1,6 +1,6 @@
 // Filesystem data structure
 
-#include "std_datatype.h"
+#include "std_type.h"
 
 #define FS_MAP_SECTOR_NUMBER    0x100
 #define FS_NODE_SECTOR_NUMBER   0x101
