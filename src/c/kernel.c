@@ -133,7 +133,23 @@ void clearScreen()
 }
 
 void writeSector(byte *buffer, int sector_number){
+    int sector_write_count = 0x01;
+    int cylinder, sector;
+    int head, drive;
 
+    cylinder = div(sector_number, 36) << 8; // CH
+    sector   = mod(sector_number, 18) + 1;  // CL
+
+    head  = mod(div(sector_number, 18), 2) << 8; // DH
+    drive = 0x00;                                // DL
+
+    interrupt(
+        0x13,                       // Interrupt number
+        0x0300 | sector_write_count, // AX
+        buffer,                     // BX
+        cylinder | sector,          // CX
+        head | drive                // DX
+    );
 }
 void readSector(byte *buffer, int sector_number){
     int sector_read_count = 0x01;
