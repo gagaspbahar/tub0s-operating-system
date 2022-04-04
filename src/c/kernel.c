@@ -62,18 +62,22 @@ void handleInterrupt21(int AX, int BX, int CX, int DX)
 
 // TODO : fillmap sm fillkernel sama apa beda?
 void fillKernelMap(){
-  struct map_filesystem map_fs_buffer;
-  int i;
+    struct map_filesystem map_fs_buffer;
+    int i;
 
-  // Load filesystem map
-  readSector(&map_fs_buffer, FS_MAP_SECTOR_NUMBER);
+    // Load filesystem map
+    readSector(&map_fs_buffer, FS_MAP_SECTOR_NUMBER);
 
-  /* 
-    Edit filesystem map disini 
-                             */
+    //Edit filesystem map disini 
+    for (i = 0; i < 16; i++){
+        map_fs_buffer.is_filled[i] = true;
+    }
+    for (i = 256; i < 512; i++){
+        map_fs_buffer.is_filled[i] = true;
+    }
 
-  // Update filesystem map
-  writeSector(&map_fs_buffer, FS_MAP_SECTOR_NUMBER);   
+    // Update filesystem map
+    writeSector(&map_fs_buffer, FS_MAP_SECTOR_NUMBER);   
 }
 
 void printString(char *string)
