@@ -235,31 +235,61 @@ void write(struct file_metadata *metadata, enum fs_retcode *return_code){
 }
 
 void read(struct file_metadata *metadata, enum fs_retcode *return_code){
-  struct node_filesystem   node_fs_buffer;
-  struct sector_filesystem sector_fs_buffer;
-  // Tambahkan tipe data yang dibutuhkan
+    // Tambahkan tipe data yang dibutuhkan
+    struct node_filesystem node_fs_buffer;
+    struct node_entry node_entry_buffer;
+    struct sector_filesystem sector_fs_buffer;
+    struct sector_entry sector_entry_buffer;
+    int i;
+    int idx_sector = -1;
 
-  // Masukkan filesystem dari storage ke memori buffer
+    // Masukkan filesystem dari storage ke memori buffer
+    readSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
+    readSector(&(node_fs_buffer.nodes[32]), FS_NODE_SECTOR_NUMBER + 1);
+    readSector(sector_fs_buffer.sector_list, FS_SECTOR_SECTOR_NUMBER);
 
-  // 1. Cari node dengan nama dan lokasi yang sama pada filesystem.
-  //    Jika ditemukan node yang cocok, lanjutkan ke langkah ke-2.
-  //    Jika tidak ditemukan kecocokan, tuliskan retcode FS_R_NODE_NOT_FOUND
-  //    dan keluar.  
+    // 1. Cari node dengan nama dan lokasi yang sama pada filesystem.
+    //    Jika ditemukan node yang cocok, lanjutkan ke langkah ke-2.
+    //    Jika tidak ditemukan kecocokan, tuliskan retcode FS_R_NODE_NOT_FOUND
+    //    dan keluar. 
+    for (i = 0; i < 64; i++){
+        memcpy(&node_entry_buffer, &(node_fs_buffer.nodes[i]), sizeof(struct node_entry));
 
-  // 2. Cek tipe node yang ditemukan
-  //    Jika tipe node adalah file, lakukan proses pembacaan.
-  //    Jika tipe node adalah folder, tuliskan retcode FS_R_TYPE_IS_FOLDER
-  //    dan keluar.
+        if (node_entry_buffer.parent_node_index == metadata->parent_index && strcmp(node_entry_buffer.name, metadata->node_name)){
+            idx_sector = node_entry_buffer.sector_entry_index;
+            break;
+        }
+    }
 
-  // Pembacaan
-  // 1. memcpy() entry sector sesuai dengan byte S
-  // 2. Lakukan iterasi proses berikut, i = 0..15
-  // 3. Baca byte entry sector untuk mendapatkan sector number partisi file
-  // 4. Jika byte bernilai 0, selesaikan iterasi
-  // 5. Jika byte valid, lakukan readSector() 
-  //    dan masukkan kedalam buffer yang disediakan pada metadata
-  // 6. Lompat ke iterasi selanjutnya hingga iterasi selesai
-  // 7. Tulis retcode FS_SUCCESS dan ganti filesize pada akhir proses pembacaan.
+    if (idx_sector == -1){
+        *return_code = FS_R_NODE_NOT_FOUND;
+        return;
+    } 
+
+    // 2. Cek tipe node yang ditemukan
+    //    Jika tipe node adalah file, lakukan proses pembacaan.
+    //    Jika tipe node adalah folder, tuliskan retcode FS_R_TYPE_IS_FOLDER
+    //    dan keluar.
+    if (idx_sector == FS_NODE_S_IDX_FOLDER){
+        *return_code = FS_R_TYPE_IS_FOLDER;
+        return;
+    }
+    // Pembacaan
+    // 1. memcpy() entry sector sesuai dengan byte S
+    // 2. Lakukan iterasi proses berikut, i = 0..15
+    // 3. Baca byte entry sector untuk mendapatkan sector number partisi file
+    // 4. Jika byte bernilai 0, selesaikan iterasi
+    // 5. Jika byte valid, lakukan readSector() 
+    //    dan masukkan kedalam buffer yang disediakan pada metadata
+    // 6. Lompat ke iterasi selanjutnya hingga iterasi selesai
+    // 7. Tulis retcode FS_SUCCESS dan ganti filesize pada akhir proses pembacaan.
+    memcpy(&sector_entry_buffer, &(sector_fs_buffer.sector_list[idx_sector]), sizeof(struct sector_entry));
+    idx_sector = sector_entry_buffer.sector_numbers[0];
+    for(i = 0; i<15 && idx_sector != 0; i++){
+        readSector(&(metadata->buffer[i * 512]), idx_sector);
+        idx_sector = sector_entry_buffer.sector_numbers[i];
+    }
+    *return_code = FS_SUCCESS;
 
 }
 
