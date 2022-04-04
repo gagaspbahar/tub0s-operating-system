@@ -10,9 +10,9 @@
 
 int main()
 {
+    char buf[128];
     fillKernelMap();
     makeInterrupt21();
-    char buf[128];
     clearScreen();
 
     makeInterrupt21();
@@ -25,8 +25,9 @@ int main()
     printString("                                    Halo dunia!\r\n");
     
     while (1){
-        readString(buf);
-        printString(buf);
+        // readString(buf);
+        // printString(buf);
+        shell();
     }
 }
 
@@ -222,7 +223,7 @@ void write(struct file_metadata *metadata, enum fs_retcode *return_code){
     //    Jika ditemukan node yang cocok, tuliskan retcode 
     //    FS_W_FILE_ALREADY_EXIST dan keluar. 
     for (i = 0; i < 64; i++){
-        if (node_fs_buffer.nodes[i].parent_idx_node == metadata->parent_index && strcmp(node_fs_buffer.nodes[i].name, metadata->node_name)){
+        if (node_fs_buffer.nodes[i].parent_node_index == metadata->parent_index && strcmp(node_fs_buffer.nodes[i].name, metadata->node_name)){
             printString("File already exist");
             *return_code = FS_W_FILE_ALREADY_EXIST;
             return;
@@ -300,7 +301,7 @@ void write(struct file_metadata *metadata, enum fs_retcode *return_code){
     // Penulisan
     // 1. Tuliskan metadata nama dan byte P ke node pada memori buffer
     strcpy(node_fs_buffer.nodes[idx_node].name, metadata->node_name);
-    node_fs_buffer.nodes[idx_node].parent_idx_node = metadata->parent_index;
+    node_fs_buffer.nodes[idx_node].parent_node_index = metadata->parent_index;
     // 2. Jika menulis folder, tuliskan byte S dengan nilai 
     //    FS_NODE_S_IDX_FOLDER dan lompat ke langkah ke-8
     // 3. Jika menulis file, tuliskan juga byte S sesuai indeks sector
@@ -370,7 +371,7 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code){
     for (i = 0; i < 64; i++){
         memcpy(&node_entry_buffer, &(node_fs_buffer.nodes[i]), sizeof(struct node_entry));
 
-        if (node_entry_buffer.parent_idx_node == metadata->parent_index && strcmp(node_entry_buffer.name, metadata->node_name)){
+        if (node_entry_buffer.parent_node_index == metadata->parent_index && strcmp(node_entry_buffer.name, metadata->node_name)){
             idx_sector = node_entry_buffer.sector_entry_index;
             break;
         }
@@ -409,20 +410,59 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code){
 }
 
 void shell(){
+  int i;
+  char** param;
   char input_buf[64];
   char path_str[128];
   byte current_dir = FS_NODE_P_IDX_ROOT;
 
   while (true) {
-    printString("OS@IF2230:");
+    printString("Tub0S@IF2230:");
     printCWD(path_str, current_dir);
     printString("$");
     readString(input_buf);
-   
-    if (strcmp(input_buf, "cd")){
-      // Utility cd
+    splitParam(input_buf, param);
+    printString(param[0]);
+    if (strcmp(param[0], "cd")){
+        // Utility cd
+    }
+    else if(strcmp(param[0], "ls")){
+        // util ls
+    }
+    else if(strcmp(param[0], "mv")){
+        // util mv
+    }
+    else if(strcmp(param[0], "mkdir")){
+        // util mkdir
+    }
+    else if(strcmp(param[0], "cat")){
+        // util cat
+    }
+    else if(strcmp(param[0], "cp")){
+        // util cp
     }
     else 
       printString("Unknown command\r\n");
  }
+}
+
+void splitParam(char* input, char** param){
+  int i = 0;
+  int j = 0;
+  int paramLen = 0;
+  int inputLen = strlen(input);
+  while(i < inputLen){
+    j = 0;
+    while(input[i] != ' ' && input[i] != '\0'){
+    //   printString(input[i]);
+      param[paramLen][j] = input[i];
+      i++;
+      j++;
+    }
+    j++;
+    i++;
+    param[paramLen][j] = '\0';
+    paramLen++;
+  }
+//   return param;
 }
