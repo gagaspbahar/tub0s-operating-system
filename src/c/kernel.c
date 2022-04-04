@@ -42,18 +42,17 @@ void handleInterrupt21(int AX, int BX, int CX, int DX)
         readString(BX);
         break;
     case 0x2:
-            readSector(BX, CX);
-            break;
-    // TODO : ini nanti di uncomment
-    // case 0x3:
-    //     writeSector(BX, CX);
-    //     break;
-    // case 0x4:
-    //     read(BX, CX);
-    //     break;
-    // case 0x5:
-    //     write(BX, CX);
-    //     break;
+        readSector(BX, CX);
+        break;
+    case 0x3:
+        writeSector(BX, CX);
+        break;
+    case 0x4:
+        read(BX, CX);
+        break;
+    case 0x5:
+        write(BX, CX);
+        break;
 
     default:
         printString("Invalid interrupt");
@@ -134,6 +133,28 @@ void clearScreen()
     interrupt(0x10, 0x3, 0, 0, 0); // Ubah video mode menjadi 3
     interrupt(0x10, (6<<8), 0xF << 8, 0, (24 << 8) + 79); // Hapus layar dengan scroll up window & ubah warna buffer
     interrupt(0x10, 0x200, 0, 0, 0); // Set cursor ke pojok kiri atas
+}
+
+void printCWD(char *path, byte cwd){
+    struct node_filesystem node_fs_buffer;
+    byte path[9];
+    byte dir = cwd;
+    int len = 0;
+
+    readSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
+    readSector(&(node_fs_buffer.nodes[32]), FS_NODE_SECTOR_NUMBER + 1);
+
+    while (dir != FS_NODE_P_IDX_ROOT){
+        path[len] = dir;
+        len++;
+        dir = node_fs_buffer.nodes[dir].parent_node_index;
+    }
+
+    while (len--){
+        printString("/");
+        printString(node_fs_buffer.nodes[path[len - 1]].name);
+    }
+    printString("/");
 }
 
 void writeSector(byte *buffer, int sector_number){
