@@ -21,6 +21,9 @@ stdlib:
 shell:
 	bcc -ansi -c -o out/shell.o src/c/shell.c
 
+test:
+	gcc tc_gen.c tc_lib -o tc_gen
+
 run:
 	bochs -f src/config/if2230.config
 
