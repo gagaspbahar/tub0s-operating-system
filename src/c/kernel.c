@@ -343,10 +343,10 @@ void write(struct file_metadata *metadata, enum fs_retcode *return_code){
     memcpy(sector_fs_buffer.sector_list[idx_sector].sector_numbers, sector_entry_buffer.sector_numbers, 16);
     // 8. Lakukan penulisan seluruh filesystem (map, node, sector) ke storage
     //    menggunakan writeSector() pada sektor yang sesuai
-    writeSector(&map_fs_buffer, FS_MAP_SECTOR_NUMBER);
+    writeSector(&map_fs_buffer.is_filled, FS_MAP_SECTOR_NUMBER);
     writeSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
     writeSector(&(node_fs_buffer.nodes[32]), FS_NODE_SECTOR_NUMBER + 1);
-    writeSector(&sector_fs_buffer, FS_SECTOR_SECTOR_NUMBER);
+    writeSector(&sector_fs_buffer.sector_list, FS_SECTOR_SECTOR_NUMBER);
     // 9. Kembalikan retcode FS_SUCCESS
     *return_code = FS_SUCCESS;
 }
