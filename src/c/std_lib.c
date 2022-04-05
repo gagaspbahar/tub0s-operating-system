@@ -23,6 +23,7 @@ int mod(int a, int n) {
 void memcpy(byte *dest, byte *src, unsigned int n) {
     // Mengcopy n bytes yang ditunjuk src ke dest
     int i;
+    clear(dest, n);
     for(i = 0; i < n; i++){
         dest[i] = src[i];
     }
@@ -49,6 +50,7 @@ bool strcmp(char *s1, char *s2) {
 void strcpy(char *dst, char *src) {
     // Melakukan penyalinan null terminated string
     int i = 0;
+    clear(dst, strlen(dst));
     while(src[i] != '\0'){
         dst[i] = src[i];
         i++;

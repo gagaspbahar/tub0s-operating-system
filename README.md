@@ -1,6 +1,6 @@
 # Tugas Besar IF2230
 
-# Milestone 1: Booting, Kernel, System Call
+# Milestone 2: Filesystem and Shell
 
 # Authors:
 - 13520016 Gagas Praharsa Bahar
@@ -9,7 +9,7 @@
 
 # Implemented Features:
 
-- printString
-- readString
-- clearScreen
-- makefile
+- read/write
+- readSector/writeSector
+- shell
+- utilities (cd, ls, mkdir, cat, mv, cp)

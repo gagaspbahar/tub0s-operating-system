@@ -82,11 +82,10 @@ void ls(char *name, byte currDir){
   if (countDir == 0){
     printString("Empty directory\r\n");
   }
-
 }
 
 void mv(byte currDir, char *name, char *target) {
-  // mv dapat memindahkan file dan folder ke root dengan “/<nama tujuan>”
+// mv dapat memindahkan file dan folder ke root dengan “/<nama tujuan>”
 // mv dapat memindahkan file dan folder ke dalam parent folder current working directory dengan “../<nama tujuan>”
 // mv dapat memasukkan file dan folder ke folder yang berada pada current working directory. 
   char buffer[1024];
@@ -113,16 +112,19 @@ void mv(byte currDir, char *name, char *target) {
     }
   }
 
+  // case gaada filenya
   if (!name_exist) {
     printString("File doesn't exist\r\n");
     return;
   }
 
+  // case gaada folder target
   if (!target_exist) {
     printString("Target directory not found\r\n");
     return;
   }
 
+  // load sector
   interrupt(0x21, 0x2, buffer, FS_NODE_SECTOR_NUMBER, 0);
   interrupt(0x21, 0x2, buffer + 512, FS_NODE_SECTOR_NUMBER + 1, 0);
 
@@ -139,7 +141,6 @@ void mv(byte currDir, char *name, char *target) {
   }
 
   if (slash == -1) {
-    // parent = "/";
     found_parent = 0;
   }
   else {
@@ -153,9 +154,10 @@ void mv(byte currDir, char *name, char *target) {
     found_parent = 1;
   }
 
+  // Kasus parent tidak ditemukan
   if (!found_parent) {
     parent_idx = FS_NODE_P_IDX_ROOT;
-  } else {
+  } else { // Cari idx parent
     for (i = 0; i < 64; i++){
       if (node_fs_buffer.nodes[i].parent_node_index == currDir && strcmp(node_fs_buffer.nodes[i].name, parent_dest)){
         parent_idx = i;

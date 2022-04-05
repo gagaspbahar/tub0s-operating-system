@@ -25,8 +25,6 @@ int main()
     printString("                                    Halo dunia!\r\n");
     
     while (1){
-        // readString(buf);
-        // printString(buf);
         shell();
     }
 }
@@ -358,7 +356,7 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code){
     struct sector_filesystem sector_fs_buffer;
     struct sector_entry sector_entry_buffer;
     int i;
-    int idx_sector = -1;
+    byte idx_sector = -1;
 
     // Masukkan filesystem dari storage ke memori buffer
     readSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
@@ -401,21 +399,17 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code){
     // 6. Lompat ke iterasi selanjutnya hingga iterasi selesai
     // 7. Tulis retcode FS_SUCCESS dan ganti filesize pada akhir proses pembacaan.
     memcpy(sector_entry_buffer.sector_numbers, &(sector_fs_buffer.sector_list[idx_sector]), sizeof(struct sector_entry));
+    
     for(i = 0; i<16; i++){
         idx_sector = sector_entry_buffer.sector_numbers[i];
         if(idx_sector == 0){
             break;
         }
         else{
-            printString("test");
             readSector(&(metadata->buffer[i * 512]), idx_sector);
-            printString("test2");
         }
-        // idx_sector = sector_entry_buffer.sector_numbers[i];
+        metadata->filesize = 512*i;
     }
-
-    printString("kontol");
-
     *return_code = FS_SUCCESS;
 }
 
@@ -427,6 +421,7 @@ void shell(){
   char input_buf[64];
   char path_str[128];
   byte current_dir = FS_NODE_P_IDX_ROOT;
+
   for(i = 0; i < 8; i++){
       for(j = 0; j < 64; j++){
           param[i][j] = 0;
@@ -448,7 +443,7 @@ void shell(){
     }
     else if(strcmp(param[0], "mv")){
         // util mv
-
+        mv(current_dir, param[1], param[2]);
     }
     else if(strcmp(param[0], "mkdir")){
         // util mkdir
@@ -478,7 +473,6 @@ int splitParam(char* input, char param[8][64]){
   while(i < inputLen){
     j = 0;
     while(input[i] != ' ' && input[i] != '\0'){
-    //   printString(input[i]);
       param[paramLen][j] = input[i];
       i++;
       j++;
@@ -488,13 +482,5 @@ int splitParam(char* input, char param[8][64]){
     param[paramLen][j] = '\0';
     paramLen++;
   }
-
-//   while(input[i] != '\0'){
-//       if(input[i] == ' '){
-//           j = 0;
-//       }
-      
-//   }
   return paramLen;
-//   return param;
 }
