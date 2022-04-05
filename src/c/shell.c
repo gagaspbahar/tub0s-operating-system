@@ -3,17 +3,106 @@
 #include "header/filesystem.h"
 #include "header/kernel.h"
 
-void cd(char *param){
+void cd(char* param, int* idxDir){
 // cd dapat memindah current working directory ke folder tujuan
 // cd dapat naik satu tingkat dengan argumen “..”
 // cd dapat langsung kembali ke root dengan argumen “/”
 // Untuk relative pathing tidak diwajibkan
+  byte file[512 * 2];
+  char currFlName[128];
+  int i = 0, j = 0;
+  int found = 0;
+  int* foundIdx;
+  int temp;
+
+  readSector(file, 0x101);
+  readSector(file+512, 0x102);
+
+  if (param[i] == '/'){
+    *idxDir = 0xFF;
+    i++;
+  }
+
+  int len = strlen(param);
+  while (i < len){
+    currFlName[j] = param[i];
+    if (currFlName[j] == '/' || currFlName[j] == '\0'){
+      currFlName[j] = '\0';
+
+      // Cek nama folder
+      if (strcmp(currFlName, "..")){
+        if (*idxDir != 0xFF){
+          *idxDir = file[(*idxDir)*16];
+        }
+      } else if (strcmp(currFlName,"")) {
+        printString("Error! Invalid Folder Name\n");
+      } else {
+        temp = *idxDir;
+        // Cek apakah file ada atau tidak
+        int fileidx = 0, k;
+        char tempname[14];
+        while (fileidx < 64 && !found){
+          if (file[16*fileidx] == *idxDir){
+            int m;
+            for (m = 0; m <14; m++){
+              tempname[i] = file[16 * fileidx + (2+i)];
+            }
+            tempname[14] = '\0';
+            
+            if (strcmp(tempname, currFlName)){
+              if (file[16*fileidx+1] == 0xFF){
+                found = 1;
+              }
+            }
+          }
+          fileidx++;
+        }
+        *foundIdx = --fileidx;
+
+        if (!found){
+          *idxDir = temp;
+          printString("Error! Folder Not Found\n");
+          return;
+        } else {
+          *idxDir = *foundIdx;
+        }
+      }
+      j = 0;
+    } else j++;
+    i++;
+  }
 }
 
-void ls(char *param){
+void ls(char parentIdx){
 // ls dapat memperlihatkan isi pada current working directory 
 // ls dapat memperlihatkan isi folder yang berada pada current working directory
+  int i = 0, j = 0, idxName, countDir = 0;
+  char file[1024];
+  interrupt(0x21, 0x2, file, 0x101, 0);
+	interrupt(0x21, 0x2, file + 512, 0x102, 0);
 
+  for (i = 0;i < 64; i++){
+    if (file[i] == parentIdx){
+      idxName = i*16 + 1;
+      j = 0;
+      if (file[i * 16 + 1] != 0xFF){
+        interrupt(0x21, 0x00, "File: ", 0, 0);
+      } else {
+        interrupt(0x21, 0x00, "Dir: ", 0, 0);
+      }
+
+      while (j < 14 && file[idxName + j] != '\0'){
+        interrupt(0x10, 0xE00 + file[j + idxName], 0, 0, 0);
+				j++;
+      }
+      countDir++;
+      interrupt(0x21, 0x00, "\r\n\0", 0, 0);
+    }
+  }
+
+  if (countDir == 0){
+    interrupt(0x21, 0x00, "Directory kosong\r\n\0", 0, 0);
+  }
 }
 
 void mv(char *param){
