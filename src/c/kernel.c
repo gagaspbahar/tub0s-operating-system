@@ -16,7 +16,6 @@ int main()
     makeInterrupt21();
     clearScreen();
 
-    makeInterrupt21();
     printString("             .___________. __    __  .______     ___        _______.\n");
     printString("             |           ||  |  |  | |   _  \\   / _ \\      /       |\n");
     printString("             `---|  |----`|  |  |  | |  |_)  | | | | |    |   (----`\n");
@@ -61,7 +60,6 @@ void handleInterrupt21(int AX, int BX, int CX, int DX)
     }
 }
 
-// TODO : fillmap sm fillkernel sama apa beda?
 void fillKernelMap(){
     struct map_filesystem map_fs_buffer;
     int i;
@@ -402,14 +400,23 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code){
     //    dan masukkan kedalam buffer yang disediakan pada metadata
     // 6. Lompat ke iterasi selanjutnya hingga iterasi selesai
     // 7. Tulis retcode FS_SUCCESS dan ganti filesize pada akhir proses pembacaan.
-    memcpy(&sector_entry_buffer, &(sector_fs_buffer.sector_list[idx_sector]), sizeof(struct sector_entry));
-    idx_sector = sector_entry_buffer.sector_numbers[0];
-    for(i = 0; i<15 && idx_sector != 0; i++){
-        readSector(&(metadata->buffer[i * 512]), idx_sector);
+    memcpy(sector_entry_buffer.sector_numbers, &(sector_fs_buffer.sector_list[idx_sector]), sizeof(struct sector_entry));
+    for(i = 0; i<16; i++){
         idx_sector = sector_entry_buffer.sector_numbers[i];
+        if(idx_sector == 0){
+            break;
+        }
+        else{
+            printString("test");
+            readSector(&(metadata->buffer[i * 512]), idx_sector);
+            printString("test2");
+        }
+        // idx_sector = sector_entry_buffer.sector_numbers[i];
     }
-    *return_code = FS_SUCCESS;
 
+    printString("kontol");
+
+    *return_code = FS_SUCCESS;
 }
 
 void shell(){
@@ -453,7 +460,7 @@ void shell(){
     }
     else if(strcmp(param[0], "cp")){
         // util cp
-        cp(param[1], current_dir);
+        cp(param[1], current_dir, param[2]);
     }
     else 
       printString("Unknown command\r\n");

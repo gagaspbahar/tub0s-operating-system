@@ -85,11 +85,106 @@ void ls(char *name, byte currDir){
 
 }
 
-void mv(char *param){
-// mv dapat memindahkan file dan folder ke root dengan “/<nama tujuan>”
+void mv(byte currDir, char *name, char *target) {
+  // mv dapat memindahkan file dan folder ke root dengan “/<nama tujuan>”
 // mv dapat memindahkan file dan folder ke dalam parent folder current working directory dengan “../<nama tujuan>”
 // mv dapat memasukkan file dan folder ke folder yang berada pada current working directory. 
+  char buffer[1024];
+  char *parent_dest, *temp;
+  struct node_filesystem node_fs_buffer;
+  int i, slash = -1;
+  byte name_idx, target_idx, parent_idx;
+  int name_exist = 0, target_exist = 0, parent_exist = 0, found_parent = 0;
 
+  readSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
+  readSector(&(node_fs_buffer.nodes[32]), FS_NODE_SECTOR_NUMBER + 1);
+
+  // Cari indexnya
+  for (i = 0; i < 64; i++){
+    if (node_fs_buffer.nodes[i].parent_node_index == currDir){
+      if (strcmp(node_fs_buffer.nodes[i].name, name) && !name_exist){
+        name_idx = i;
+        name_exist = 1;
+       }
+      if (strcmp(node_fs_buffer.nodes[i].name, target) && !target_exist){
+        target_idx = i;
+        target_exist = 1;
+      }
+    }
+  }
+
+  if (!name_exist) {
+    printString("File doesn't exist\r\n");
+    return;
+  }
+
+  if (!target_exist) {
+    printString("Target directory not found\r\n");
+    return;
+  }
+
+  interrupt(0x21, 0x2, buffer, FS_NODE_SECTOR_NUMBER, 0);
+  interrupt(0x21, 0x2, buffer + 512, FS_NODE_SECTOR_NUMBER + 1, 0);
+
+  if (buffer[target_idx * 16 + 1] != FS_NODE_S_IDX_FOLDER && target_idx != FS_NODE_P_IDX_ROOT) {
+    printString("Target is not a folder \r\n");
+    return;
+  }
+
+  strcpy(parent_dest, target);
+  for (i = 0; parent_dest[i] != '\0' ; i++) {
+    if (parent_dest[i] == '/') {
+      slash = i;
+    }
+  }
+
+  if (slash == -1) {
+    // parent = "/";
+    found_parent = 0;
+  }
+  else {
+    while (1) {
+      if (parent_dest[slash] == '\0') {
+        break;
+      }
+      parent_dest[slash] = '\0';
+    }
+
+    found_parent = 1;
+  }
+
+  if (!found_parent) {
+    parent_idx = FS_NODE_P_IDX_ROOT;
+  } else {
+    for (i = 0; i < 64; i++){
+      if (node_fs_buffer.nodes[i].parent_node_index == currDir && strcmp(node_fs_buffer.nodes[i].name, parent_dest)){
+        parent_idx = i;
+        parent_exist = 1;
+        break;
+      }
+    }
+
+    if (!parent_exist) {
+      printString("ERROR\r\n");
+      return;
+    }
+  }
+
+  strcpy(temp, name);
+
+  for (i=0;i < 14 && temp[i] != '\0';i++) {
+    buffer[name_idx * 16 + i + 2] = temp[i];
+  }
+
+  // null terminator buat sisanya
+  for (;i < 14; i++) {
+    buffer[name_idx * 16 + i + 2] = '\0';
+  }
+
+  buffer[name_idx * 16] = parent_idx;
+
+  interrupt(0x21, 0x3, buffer, FS_NODE_SECTOR_NUMBER, 0);
+  interrupt(0x21, 0x3, buffer + 512, FS_NODE_SECTOR_NUMBER + 1, 0);
 }
 
 void mkdir(char *param, byte idxParent){
@@ -124,7 +219,7 @@ void cat(char *param, byte currDir){
 
   // Cari indexnya
   for (i = 0; i < 64; i++){
-    if (node_fs_buffer.nodes[i].parent_node_index == data.parent_index && strcmp(node_fs_buffer.nodes[i].name, data.node_name)){
+    if (node_fs_buffer.nodes[i].parent_node_index == currDir && strcmp(node_fs_buffer.nodes[i].name, param)){
         idx_sector = i;
         break;
     }
@@ -143,7 +238,7 @@ void cat(char *param, byte currDir){
   data.parent_index = node_fs_buffer.nodes[idx_sector].parent_node_index;
   read(&data, &return_code);
 
-  if (return_code == FS_NODE_S_IDX_FOLDER){
+  if (return_code == FS_R_TYPE_IS_FOLDER){
     printString("Type is folder\r\n");
   } else if (return_code == FS_R_NODE_NOT_FOUND){
     printString("Node not found\r\n");
@@ -154,20 +249,22 @@ void cat(char *param, byte currDir){
 
 }
 
-void cp(char *param, byte currDir){
+void cp(char *param, byte currDir, char *target){
 // cp dapat melakukan copy file dari current working directory ke current working directory
 // Relative pathing dan peng-copyan rekursif folder tidak diwajibkan
   struct node_filesystem node_fs_buffer;
   struct file_metadata data;
   enum fs_retcode return_code;
-  byte buffer[4096];
+  byte tempBuffer[512*16];
 
   // Inisialisasi pemindahan file
+  data.buffer = tempBuffer;
   data.parent_index = currDir;
-  strcpy(data.node_name, param);
+  data.node_name = param;
 
   // Read & Write
   read(&data, &return_code);
+  data.node_name = target;
   write(&data, &return_code);
 
   // Error
