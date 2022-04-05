@@ -7,6 +7,7 @@
 #include "header/kernel.h"
 #include "header/std_lib.h"
 #include "header/filesystem.h"
+#include "header/shell.h"
 
 int main()
 {
@@ -412,7 +413,10 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code){
 
 void shell(){
   int i;
+  int j;
+  int paramLen;
   char** param;
+  char** secondParam;
   char input_buf[64];
   char path_str[128];
   byte current_dir = FS_NODE_P_IDX_ROOT;
@@ -422,32 +426,42 @@ void shell(){
     printCWD(path_str, current_dir);
     printString("$");
     readString(input_buf);
-    splitParam(input_buf, param);
-    printString(param[0]);
+    paramLen = splitParam(input_buf, param);
+    for(j = 0; j < paramLen-1; j++){
+        secondParam[j] = param[j+1];
+    }
     if (strcmp(param[0], "cd")){
         // Utility cd
+        cd(current_dir, secondParam, &current_dir);
     }
     else if(strcmp(param[0], "ls")){
         // util ls
+        ls(secondParam[0], current_dir);
     }
     else if(strcmp(param[0], "mv")){
         // util mv
+
     }
     else if(strcmp(param[0], "mkdir")){
         // util mkdir
+        mkdir(secondParam, current_dir);
     }
     else if(strcmp(param[0], "cat")){
         // util cat
+        cat(secondParam, current_dir);
     }
     else if(strcmp(param[0], "cp")){
         // util cp
+        cp(secondParam, current_dir);
     }
     else 
       printString("Unknown command\r\n");
+
  }
 }
 
-void splitParam(char* input, char** param){
+// Returns number of parameters
+int splitParam(char* input, char** param){
   int i = 0;
   int j = 0;
   int paramLen = 0;
@@ -465,5 +479,6 @@ void splitParam(char* input, char** param){
     param[paramLen][j] = '\0';
     paramLen++;
   }
+  return paramLen;
 //   return param;
 }
