@@ -217,6 +217,7 @@ void write(struct file_metadata *metadata, enum fs_retcode *return_code){
     readSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
     readSector(&(node_fs_buffer.nodes[32]), FS_NODE_SECTOR_NUMBER + 1);
     readSector(sector_fs_buffer.sector_list, FS_SECTOR_SECTOR_NUMBER);
+    readSector(&map_fs_buffer, FS_MAP_SECTOR_NUMBER);
 
     // 1. Cari node dengan nama dan lokasi parent yang sama pada node.
     //    Jika tidak ditemukan kecocokan, lakukan proses ke-2.
