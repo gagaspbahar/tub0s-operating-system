@@ -3,88 +3,69 @@
 #include "header/filesystem.h"
 #include "header/kernel.h"
 
-void cd(char* param, int* idxDir){
-// cd dapat memindah current working directory ke folder tujuan
-// cd dapat naik satu tingkat dengan argumen “..”
-// cd dapat langsung kembali ke root dengan argumen “/”
+void cd(byte idxParent, char *param, byte *idxDir){
 // Untuk relative pathing tidak diwajibkan
-  byte file[512 * 2];
-  char currFlName[128];
-  int i = 0, j = 0;
-  int found = 0;
-  int* foundIdx;
-  int temp;
+  int i = 0, found = 0;
+  struct node_filesystem node_fs_buffer;
+  enum fs_retcode return_code;
 
-  readSector(file, 0x101);
-  readSector(file+512, 0x102);
-
+  readSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
+  readSector(&(node_fs_buffer.nodes[32]), FS_NODE_SECTOR_NUMBER + 1);
   
-  if (param[i] == '/'){
-    *idxDir = 0xFF;
-    i++;
+  // cd dapat langsung kembali ke root dengan argumen “/”
+  if (strcmp(param, "/")){
+    *idxDir = FS_NODE_P_IDX_ROOT;
+    return_code = FS_SUCCESS;
+    return;
   }
 
-  int len = strlen(param);
-  while (i < len){
-    currFlName[j] = param[i];
-    if (currFlName[j] == '/' || currFlName[j] == '\0'){
-      currFlName[j] = '\0';
+  // cd dapat naik satu tingkat dengan argumen “..”
+  if (strcmp(param, "..")){
+    // Kasus sudah di root
+    if (idxParent == FS_NODE_P_IDX_ROOT){
+      printString("Doesn't have parent directory\r\n");
+      return_code = FS_SUCCESS;
+    }
+    else {
+      *idxDir = node_fs_buffer.nodes[idxParent].parent_node_index;
+    }
+    return;
+  }
 
-      // Cek nama folder
-      if (strcmp(currFlName, "..")){
-        if (*idxDir != 0xFF){
-          *idxDir = file[(*idxDir)*16];
-        }
-      } else if (strcmp(currFlName,"")) {
-        printString("Error! Invalid Folder Name\n");
-      } else {
-        temp = *idxDir;
-        // Cek apakah file ada atau tidak
-        int fileidx = 0, k;
-        char tempname[14];
-        while (fileidx < 64 && !found){
-          if (file[16*fileidx] == *idxDir){
-            int m;
-            for (m = 0; m <14; m++){
-              tempname[i] = file[16 * fileidx + (2+i)];
-            }
-            tempname[14] = '\0';
-            
-            if (strcmp(tempname, currFlName)){
-              if (file[16*fileidx+1] == 0xFF){
-                found = 1;
-              }
-            }
-          }
-          fileidx++;
-        }
-        *foundIdx = --fileidx;
-
-        if (!found){
-          *idxDir = temp;
-          printString("Error! Folder Not Found\n");
-          return;
-        } else {
-          *idxDir = *foundIdx;
-        }
-      }
-      j = 0;
-    } else j++;
-    i++;
+  // cd dapat memindah current working directory ke folder tujuan
+  for (i = 0; i<64; i++){
+    if (node_fs_buffer.nodes[i].parent_node_index == idxParent && strcmp(param, node_fs_buffer.nodes[i].name))
+    {
+        *idxDir = i;
+        return_code = FS_SUCCESS;
+        found = 1;
+        break;
+    }
+  }
+  
+  // Folder tidak dapat ditemukan
+  if (!found){
+    printString("The system cannot find the path specified.\r\n");
+    return_code = FS_R_NODE_NOT_FOUND;
   }
 }
 
-void ls(byte currDir){
-// ls dapat memperlihatkan isi pada current working directory 
-// ls dapat memperlihatkan isi folder yang berada pada current working directory
-  int i = 0, j = 0, idxName, countDir = 0;
-  char file[1024];
-  int found = 0;
+void ls(char *name, byte currDir){
+// 1. ls dapat memperlihatkan isi pada current working directory 
+// 2. ls dapat memperlihatkan isi folder yang berada pada current working directory
+  int i = 0, found = 0, countDir = 0;
   struct node_filesystem node_fs_buffer;
   byte parentIdx, sectorIdx;
 
-  readSector(&node_fs_buffer, FS_NODE_SECTOR_NUMBER);
+  readSector(&(node_fs_buffer.nodes[0]), FS_NODE_SECTOR_NUMBER);
+  readSector(&(node_fs_buffer.nodes[32]), FS_NODE_SECTOR_NUMBER + 1);
 
+  // Kasus 2, ingin melihat isi folder
+  if (!strlen(name) == 0){
+    cd(currDir, name, &currDir);
+  }
+
+  // Print isi
   for (i = 0;i < 64; i++){
     parentIdx = node_fs_buffer.nodes[i].parent_node_index;
     sectorIdx = node_fs_buffer.nodes[i].sector_entry_index;
@@ -93,55 +74,39 @@ void ls(byte currDir){
     if (found){
       printString(node_fs_buffer.nodes[i].name);
       printString("\r\n");
+      countDir++;
     }
-
-    // TODO : HANDLE KALO BUAT PRINT SEMUA ISI FOLDER DALAM DIRNYA JUGA (harus ganti cwd)
-
-    // if (file[i] == parentIdx){
-    //   idxName = i*16 + 1;
-    //   j = 0;
-    //   if (file[i * 16 + 1] != 0xFF){
-    //     interrupt(0x21, 0x00, "File: ", 0, 0);
-    //   } else {
-    //     interrupt(0x21, 0x00, "Dir: ", 0, 0);
-    //   }
-
-    //   while (j < 14 && file[idxName + j] != '\0'){
-    //     interrupt(0x10, 0xE00 + file[j + idxName], 0, 0, 0);
-		// 		j++;
-    //   }
-    //   countDir++;
-    //   interrupt(0x21, 0x00, "\r\n\0", 0, 0);
-    // }
   }
 
-  // if (countDir == 0){
-  //   interrupt(0x21, 0x00, "Directory kosong\r\n\0", 0, 0);
-  // }
+  // Kasus kosong
+  if (countDir == 0){
+    printString("Empty directory\r\n");
+  }
+
 }
 
 void mv(char *param){
-//   mv dapat memindahkan file dan folder ke root dengan “/<nama tujuan>”
+// mv dapat memindahkan file dan folder ke root dengan “/<nama tujuan>”
 // mv dapat memindahkan file dan folder ke dalam parent folder current working directory dengan “../<nama tujuan>”
 // mv dapat memasukkan file dan folder ke folder yang berada pada current working directory. 
+
 }
 
 void mkdir(char *param, byte idxParent){
   // mkdir dapat membuat folder baru pada current working directory
   struct file_metadata *data;
-  int isSuccess;
+  enum fs_retcode return_code;
 
+  // set data
   data->node_name = param;
   data->parent_index = idxParent;
   data->filesize = 0;// Folder size = 0 
-  write(data, &isSuccess);
+  write(data, &return_code);
 
-  if (isSuccess == 0){
-    printString("Successfully created directory\n");
+  if (return_code == 0){
+    printString("Successfully created directory\r\n");
   } else {
-    printString("Build failed\n");
-    printString((char)isSuccess);
-    printString("\n");
+    printString("Build failed\r\n");
   }
 
 }
@@ -165,6 +130,7 @@ void cat(char *param, byte currDir){
     }
   }
 
+  // Kasus file tidak dapat ditemukan
   if (idx_sector == -1){
       return_code = FS_R_NODE_NOT_FOUND;
       printString("File not found\n");
@@ -178,17 +144,35 @@ void cat(char *param, byte currDir){
   read(&data, &return_code);
 
   if (return_code == FS_NODE_S_IDX_FOLDER){
-    printString("Type is folder\n");
+    printString("Type is folder\r\n");
   } else if (return_code == FS_R_NODE_NOT_FOUND){
-    printString("Node not found\n");
+    printString("Node not found\r\n");
   } else {
     printString(data.buffer);
-    printString("\n");
+    printString("\r\n");
   }
 
 }
 
-void cp(char *param){
+void cp(char *param, byte currDir){
 // cp dapat melakukan copy file dari current working directory ke current working directory
 // Relative pathing dan peng-copyan rekursif folder tidak diwajibkan
+  struct node_filesystem node_fs_buffer;
+  struct file_metadata data;
+  enum fs_retcode return_code;
+  byte buffer[4096];
+
+  // Inisialisasi pemindahan file
+  data.parent_index = currDir;
+  strcpy(data.node_name, param);
+
+  // Read & Write
+  read(&data, &return_code);
+  write(&data, &return_code);
+
+  // Error
+  if (return_code == FS_W_FILE_ALREADY_EXIST){
+    printString("File already exist\r\n");
+  }
+
 }
