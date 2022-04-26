@@ -27,3 +27,6 @@ void read(struct file_metadata *metadata, enum fs_retcode *return_code);
 void shell();
 // int splitParam(char* input, char** param);
 int splitParam(char* input, char param[8][64]);
+
+extern void launchProgram(int segment);
+void executeProgram(struct file_metadata *metadata, int segment);

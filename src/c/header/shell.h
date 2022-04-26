@@ -1,11 +1,8 @@
-void cd(byte idxParent, char *param, byte *idxDir);
+#ifndef SHELL_H
+#define SHELL_H
 
-void ls(char *name, byte currDir);
+#include "std_type.h"
+#include "filesystem.h"
 
-void mv(byte currDir, char *name, char *target);
 
-void mkdir(char *param, byte idxParent);
-
-void cat(char *param, byte currDir);
-
-void cp(char *param, byte currDir, char *target);
+#endif
