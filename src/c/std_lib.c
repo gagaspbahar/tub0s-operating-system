@@ -2,7 +2,6 @@
 
 // Opsional : Tambahkan implementasi kode C
 
-// TODO
 int div(int a, int b) {
     int ans = 0;
 	while (ans * b <= a){
