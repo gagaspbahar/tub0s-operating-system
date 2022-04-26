@@ -1,7 +1,8 @@
 #ifndef FILEIO_H
 #define FILEIO_H
 
-#include "../header/std_type.h"
+#include "std_type.h"
+
 void readSector(byte *buffer, int sector_number);
 
 void writeSector(byte *buffer, int sector_number);
