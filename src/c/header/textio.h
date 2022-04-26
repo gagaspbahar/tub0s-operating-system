@@ -1,7 +1,7 @@
 #ifndef TEXTIO_H
 #define TEXTIO_H
 
-#include "../../header/std_type.h"
+#include "std_type.h"
 
 int puts(char *string);
 
