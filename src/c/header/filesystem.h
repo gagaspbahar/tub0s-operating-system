@@ -45,6 +45,7 @@ struct file_metadata {
     unsigned int filesize;
 };
 
+typedef struct file_metadata FileMetadata;
 
 
 // Untuk error code write & read

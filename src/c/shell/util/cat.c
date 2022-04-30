@@ -1,9 +1,4 @@
-#include "../../header/std_type.h"
-#include "../../header/textio.h"
-#include "../../header/fileio.h"
-#include "../../header/program.h"
-#include "../../header/utils.h"
-#include "../../header/filesystem.h"
+#include "../../header/cat.h"
 
 int main() {
     struct message msg;

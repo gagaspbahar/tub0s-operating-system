@@ -27,3 +27,35 @@ void strcpy(char *dst, char *src) {
         i++;
     }
 }
+
+int splitParam(char *input, char param[8][64])
+{
+    int i = 0;
+    int j = 0;
+    int paramLen = 0;
+    int inputLen = strlen(input);
+    while (i < inputLen)
+    {
+        j = 0;
+        while (input[i] != ' ' && input[i] != '\0')
+        {
+            param[paramLen][j] = input[i];
+            i++;
+            j++;
+        }
+        j++;
+        i++;
+        param[paramLen][j] = '\0';
+        paramLen++;
+    }
+    return paramLen;
+}
+
+void memcpy(byte *dest, byte *src, unsigned int n) {
+    // Mengcopy n bytes yang ditunjuk src ke dest
+    int i;
+    clear(dest, n);
+    for(i = 0; i < n; i++){
+        dest[i] = src[i];
+    }
+}

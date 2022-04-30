@@ -17,4 +17,6 @@ struct message
   byte other[317];
 };
 
+typedef struct message Message;
+
 #endif

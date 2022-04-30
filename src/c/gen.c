@@ -44,5 +44,12 @@ int main(int argc, char const *argv[])
 void shell(byte buf[2880][512])
 {
   create_folder(buf, "bin", 0xFF);
+  insert_file(buf, "cp", 0);
+  insert_file(buf, "cd", 0);
+  insert_file(buf, "ls", 0);
+  insert_file(buf, "mv", 0);
+  insert_file(buf, "cat", 0);
+  insert_file(buf, "mkdir", 0);
   insert_file(buf, "shell", 0);
+  
 }
