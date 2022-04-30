@@ -19,13 +19,8 @@ int main()
 
     strcpy(meta.node_name, "shell");
     meta.parent_index = 0x0;
-    // interrupt(0x21, 0x6, &meta, 0x2000, 0x0);
     executeProgram(&meta, 0x2000);
     while (true);
-    // while (1)
-    // {
-    // shell();
-    // }
 }
 
 void logo()

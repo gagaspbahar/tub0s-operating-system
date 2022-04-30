@@ -82,9 +82,7 @@ ngetes:
 test:
 	gcc tc_gen.c tc_lib -o tc_gen
 
-testshell: lib compile_lib shell dbk run
-
 run:
 	bochs -f src/config/if2230.config
 
-build-run: all run
+build-run: lib compile_lib shell dbk run

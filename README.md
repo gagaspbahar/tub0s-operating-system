@@ -12,8 +12,9 @@
 - executeProgram
 - shell, util separation from kernel
 - message passing
+- multiple program
 
 # To run
-- `make testshell`
+- `make build-run`
 - `make generate`
 - Enjoy

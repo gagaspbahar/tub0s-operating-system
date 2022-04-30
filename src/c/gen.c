@@ -51,5 +51,4 @@ void shell(byte buf[2880][512])
   insert_file(buf, "cat", 0);
   insert_file(buf, "mkdir", 0);
   insert_file(buf, "shell", 0);
-  
 }
