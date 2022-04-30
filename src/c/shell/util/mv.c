@@ -8,9 +8,7 @@
 int main() {
     struct message msg;
     get_message(&msg);
-    /*
-        TODO : Implementasi mv
-    */
+    mv(msg.current_directory, msg.arg2, msg.arg3);
     exit();
 }
 
@@ -44,13 +42,13 @@ void mv(byte currDir, char *name, char *target) {
 
   // case gaada filenya
   if (!name_exist) {
-    printString("File doesn't exist\r\n");
+    puts("File doesn't exist\r\n");
     return;
   }
 
   // case gaada folder target
   if (!target_exist) {
-    printString("Target directory not found\r\n");
+    puts("Target directory not found\r\n");
     return;
   }
 
@@ -59,7 +57,7 @@ void mv(byte currDir, char *name, char *target) {
   interrupt(0x21, 0x2, buffer + 512, FS_NODE_SECTOR_NUMBER + 1, 0);
 
   if (buffer[target_idx * 16 + 1] != FS_NODE_S_IDX_FOLDER && target_idx != FS_NODE_P_IDX_ROOT) {
-    printString("Target is not a folder \r\n");
+    puts("Target is not a folder \r\n");
     return;
   }
 
@@ -97,7 +95,7 @@ void mv(byte currDir, char *name, char *target) {
     }
 
     if (!parent_exist) {
-      printString("ERROR\r\n");
+      puts("ERROR\r\n");
       return;
     }
   }

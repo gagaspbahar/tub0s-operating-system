@@ -8,9 +8,7 @@
 int main() {
     struct message msg;
     get_message(&msg);
-    /*
-        TODO : Implementasi cp
-    */
+    cp(msg.arg2, msg.current_directory, msg.arg3);
     exit();
 }
 
@@ -29,10 +27,10 @@ void cp(char *param, byte currDir, char *target){
   // Inisialisasi pemindahan file
   data.buffer = tempBuffer;
   if (return_code == FS_R_NODE_NOT_FOUND){
-    printString("There is no such file\r\n");
+    puts("There is no such file\r\n");
     return;
   } else if (return_code == FS_R_TYPE_IS_FOLDER){
-    printString("Cannot copy directory\r\n");
+    puts("Cannot copy directory\r\n");
     return;
   }
   data.parent_index = currDir;
@@ -45,15 +43,15 @@ void cp(char *param, byte currDir, char *target){
 
   // Error
   if (return_code == FS_W_FILE_ALREADY_EXIST){
-    printString("File already exist\r\n");
+    puts("File already exist\r\n");
   } else if (return_code == FS_W_NOT_ENOUGH_STORAGE){
-    printString("Not enough space\r\n");
+    puts("Not enough space\r\n");
   } else if (return_code == FS_W_MAXIMUM_NODE_ENTRY){
-    printString("Node reached maximum capacity\r\n");
+    puts("Node reached maximum capacity\r\n");
   } else if (return_code == FS_W_MAXIMUM_SECTOR_ENTRY){
-    printString("Sector reached maximum capacity\r\n");
+    puts("Sector reached maximum capacity\r\n");
   } else if (return_code == FS_W_INVALID_FOLDER){
-    printString("Invalid folder\r\n");
+    puts("Invalid folder\r\n");
   }
 
 }

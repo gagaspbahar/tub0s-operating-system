@@ -8,9 +8,7 @@
 int main() {
     struct message msg;
     get_message(&msg);
-    /*
-        TODO : Implementasi cat
-    */
+    cat(msg.arg2, msg.current_directory);
     exit();
 }
 
@@ -63,12 +61,12 @@ void cat(char *param, byte currDir){
   read(&data, &return_code);
 
   if (return_code == FS_R_TYPE_IS_FOLDER){
-    printString("Type is folder\r\n");
+    puts("Type is folder\r\n");
   } else if (return_code == FS_R_NODE_NOT_FOUND){
-    printString("Node not found\r\n");
+    puts("Node not found\r\n");
   } else {
-    printString(data.buffer);
-    printString("\r\n");
+    puts(data.buffer);
+    puts("\r\n");
   }
 
 }

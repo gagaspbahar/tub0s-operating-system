@@ -8,9 +8,7 @@
 int main() {
     struct message msg;
     get_message(&msg);
-    /*
-        TODO : Implementasi ls
-    */
+    ls(msg.arg2, msg.current_directory);
     exit();
 }
 
@@ -41,14 +39,14 @@ void ls(char *name, byte currDir){
     found = !strcmp(node_fs_buffer.nodes[i].name, "") && parentIdx == currDir && sectorIdx;
 
     if (found){
-      printString(node_fs_buffer.nodes[i].name);
-      printString("\r\n");
+      puts(node_fs_buffer.nodes[i].name);
+      puts("\r\n");
       countDir++;
     }
   }
 
   // Kasus kosong
   if (countDir == 0){
-    printString("Empty directory\r\n");
+    puts("Empty directory\r\n");
   }
 }

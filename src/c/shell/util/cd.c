@@ -8,9 +8,7 @@
 int main() {
     struct message msg;
     get_message(&msg);
-    /*
-        TODO : Implementasi cd
-    */
+    cd(msg.current_directory, msg.arg2, &msg.current_directory);
     exit();
 }
 
@@ -34,7 +32,7 @@ void cd(byte idxParent, char *param, byte *idxDir){
   if (strcmp(param, "..")){
     // Kasus sudah di root
     if (idxParent == FS_NODE_P_IDX_ROOT){
-      printString("Doesn't have parent directory\r\n");
+      puts("Doesn't have parent directory\r\n");
       return_code = FS_SUCCESS;
     }
     else {
@@ -56,7 +54,7 @@ void cd(byte idxParent, char *param, byte *idxDir){
   
   // Folder tidak dapat ditemukan
   if (!found){
-    printString("The system cannot find the path specified.\r\n");
+    puts("The system cannot find the path specified.\r\n");
     return_code = FS_R_NODE_NOT_FOUND;
   }
 }

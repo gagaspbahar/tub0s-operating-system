@@ -8,9 +8,7 @@
 int main() {
     struct message msg;
     get_message(&msg);
-    /*
-        TODO : Implementasi mkdir
-    */
+    mkdir(msg.arg2, msg.current_directory);
     exit();
 }
 
@@ -26,9 +24,9 @@ void mkdir(char *param, byte idxParent){
   write(data, &return_code);
 
   if (return_code == 0){
-    printString("Successfully created directory\r\n");
+    puts("Successfully created directory\r\n");
   } else {
-    printString("Build failed\r\n");
+    puts("Build failed\r\n");
   }
 
 }
