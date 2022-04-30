@@ -20,10 +20,21 @@ void cp(char *param, byte currDir, char *target){
   struct node_filesystem node_fs_buffer;
   struct file_metadata data;
   enum fs_retcode return_code;
-  byte tempBuffer[512*16];
+  byte tempBuffer[8192];
+  int i;
+  for(i = 0; i < 8192; i++){
+    tempBuffer[i] = 0x0;
+  }
 
   // Inisialisasi pemindahan file
   data.buffer = tempBuffer;
+  if (return_code == FS_R_NODE_NOT_FOUND){
+    printString("There is no such file\r\n");
+    return;
+  } else if (return_code == FS_R_TYPE_IS_FOLDER){
+    printString("Cannot copy directory\r\n");
+    return;
+  }
   data.parent_index = currDir;
   data.node_name = param;
 
@@ -35,6 +46,14 @@ void cp(char *param, byte currDir, char *target){
   // Error
   if (return_code == FS_W_FILE_ALREADY_EXIST){
     printString("File already exist\r\n");
+  } else if (return_code == FS_W_NOT_ENOUGH_STORAGE){
+    printString("Not enough space\r\n");
+  } else if (return_code == FS_W_MAXIMUM_NODE_ENTRY){
+    printString("Node reached maximum capacity\r\n");
+  } else if (return_code == FS_W_MAXIMUM_SECTOR_ENTRY){
+    printString("Sector reached maximum capacity\r\n");
+  } else if (return_code == FS_W_INVALID_FOLDER){
+    printString("Invalid folder\r\n");
   }
 
 }

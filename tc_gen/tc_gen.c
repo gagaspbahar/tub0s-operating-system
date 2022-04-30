@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define NAMA_IMAGE "system.img"
+#define NAMA_IMAGE "../out/system.img"
 
 typedef unsigned char byte;
 
@@ -12,9 +12,8 @@ typedef unsigned char byte;
 extern void insert_file(byte buf[2880][512], char *fname, byte parent_idx);
 extern void create_folder(byte buf[2880][512], char *fname, byte parent_idx);
 
-
-
-void tc_A(byte buf[2880][512]) {
+void tc_A(byte buf[2880][512])
+{
     create_folder(buf, "folder1", 0xFF);
     create_folder(buf, "folder2", 0);
     create_folder(buf, "folder3", 0);
@@ -32,10 +31,12 @@ void tc_A(byte buf[2880][512]) {
     insert_file(buf, "file_src/tc_a/file_luar", 0xFF);
 }
 
-void tc_B(byte buf[2880][512]) {
+void tc_B(byte buf[2880][512])
+{
     insert_file(buf, "file_src/tc_b/file_idx_0", 0xFF);
     create_folder(buf, "folder1", 0xFF);
-    for (int i = 1; i < 62; i++) {
+    for (int i = 1; i < 62; i++)
+    {
         char str_buf[16];
         sprintf(str_buf, "folder%d", i + 1);
         create_folder(buf, str_buf, i);
@@ -43,7 +44,8 @@ void tc_B(byte buf[2880][512]) {
     insert_file(buf, "file_src/tc_b/file_idx_63", 0xFF);
 }
 
-void tc_C(byte buf[2880][512]) {
+void tc_C(byte buf[2880][512])
+{
     create_folder(buf, "A", 0xFF);
     create_folder(buf, "test", 0);
     create_folder(buf, "A11", 1);
@@ -57,20 +59,28 @@ void tc_C(byte buf[2880][512]) {
     create_folder(buf, "test", 8);
 }
 
-void tc_D(byte buf[2880][512]) {
+void tc_D(byte buf[2880][512])
+{
     insert_file(buf, "file_src/tc_d/512", 0xFF);
     insert_file(buf, "file_src/tc_d/1024", 0xFF);
-    for (int i = 0; i < 14; i++) {
+    for (int i = 0; i < 14; i++)
+    {
         char str_buf[32];
         sprintf(str_buf, "file_src/tc_d/8192_%d", i + 1);
         insert_file(buf, str_buf, 0xFF);
     }
 }
 
+void shell(byte buf[2880][512])
+{
+    create_folder(buf, "bin", 0xFF);
+    insert_file(buf, "shell", 0);
+}
 
-
-int main(int argc, char const *argv[]) {
-    if (argc < 2) {
+int main(int argc, char const *argv[])
+{
+    if (argc < 2)
+    {
         fprintf(stderr, "Usage : tester <test case>\n");
         exit(1);
     }
@@ -78,7 +88,8 @@ int main(int argc, char const *argv[]) {
     // Load entire file and save to buffer
     FILE *image = fopen(NAMA_IMAGE, "rb");
 
-    if (image == NULL) {
+    if (image == NULL)
+    {
         fprintf(stderr, "Error : File image <%s> not found\n", NAMA_IMAGE);
         exit(1);
     }
@@ -91,20 +102,23 @@ int main(int argc, char const *argv[]) {
     fclose(image);
     image = fopen(NAMA_IMAGE, "wb");
 
-    switch (argv[1][0]) {
-        case 'A':
-            tc_A(imagebuffer);
-            break;
-        case 'B':
-            tc_B(imagebuffer);
-            break;
-        case 'C':
-            tc_C(imagebuffer);
-            break;
-        case 'D':
-            tc_D(imagebuffer);
-            break;
+    switch (argv[1][0])
+    {
+    case 'A':
+        tc_A(imagebuffer);
+        break;
+    case 'B':
+        tc_B(imagebuffer);
+        break;
+    case 'C':
+        tc_C(imagebuffer);
+        break;
+    case 'D':
+        tc_D(imagebuffer);
+        break;
     }
+
+    shell(imagebuffer);
 
     // Overwrite old file
     for (int i = 0; i < 2880; i++)

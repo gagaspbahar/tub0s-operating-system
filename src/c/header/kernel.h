@@ -2,7 +2,6 @@
 
 #include "std_type.h"
 #include "std_lib.h"
-#include "std_type.h"
 
 
 // Fungsi bawaan

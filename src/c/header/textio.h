@@ -1,10 +1,5 @@
-#ifndef TEXTIO_H
-#define TEXTIO_H
-
 #include "std_type.h"
 
-int puts(char *string);
-
-int gets(char *string);
-
-#endif
+extern int interrupt(int int_number, int AX, int BX, int CX, int DX);
+void puts(char* string);
+int gets(char* string);

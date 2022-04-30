@@ -1,5 +1,3 @@
-// Implementasi tipe data umum
-
 #ifndef _STD_TYPE_H
 #define _STD_TYPE_H
 
@@ -15,7 +13,7 @@ struct message
   char arg1[64];
   char arg2[64];
   char arg3[64];
-  int next_program_segment; // Dapat digunakan untuk bagian 3.5
+  int next_program_segment;
   byte other[317];
 };
 

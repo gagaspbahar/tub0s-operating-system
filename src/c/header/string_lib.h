@@ -1,7 +1,6 @@
 #ifndef STRING_H
 #define STRING_H
-
-#include "../../header/std_type.h"
+#include "std_type.h"
 
 unsigned int strlen(char *string);
 // Mengembalikan panjang suatu null terminated string

@@ -1,4 +1,4 @@
-#include "header/string.h"
+#include "../header/string_lib.h"
 
 unsigned int strlen(char *string) {
     // Mengembalikan panjang suatu null terminated string
