@@ -1,6 +1,6 @@
 # Tugas Besar IF2230
 
-# Milestone 2: Filesystem and Shell
+# Milestone 3: This too shall pass
 
 # Authors:
 - 13520016 Gagas Praharsa Bahar
@@ -9,7 +9,11 @@
 
 # Implemented Features:
 
-- read/write
-- readSector/writeSector
-- shell
-- utilities (cd, ls, mkdir, cat, mv, cp)
+- executeProgram
+- shell, util separation from kernel
+- message passing
+
+# To run
+- `make testshell`
+- `make generate`
+- Enjoy

@@ -13,7 +13,7 @@ kernel:
 	bcc -ansi -c -o out/kernel.o src/c/kernel.c
 	nasm -f as86 src/asm/kernel.asm -o out/kernel_asm.o
 	nasm -f as86 src/asm/interrupt.asm -o out/lib_interrupt.o
-	ld86 -o out/kernel -d out/kernel.o out/kernel_asm.o out/std_lib.o out/lib_interrupt.o
+	ld86 -o out/kernel -d out/kernel.o out/kernel_asm.o out/std_lib.o out/lib_interrupt.o out/utils.o
 	dd if=out/kernel of=out/system.img bs=512 conv=notrunc seek=1
 
 dbk: diskimage bootloader kernel

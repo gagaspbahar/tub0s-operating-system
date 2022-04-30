@@ -2,7 +2,8 @@
 
 #include "std_type.h"
 #include "std_lib.h"
-
+#include "filesystem.h"
+// #include "utils.h"
 
 // Fungsi bawaan
 extern void putInMemory(int segment, int address, byte b);
@@ -29,3 +30,4 @@ int splitParam(char* input, char param[8][64]);
 
 extern void launchProgram(int segment);
 void executeProgram(struct file_metadata *metadata, int segment);
+void logo();
